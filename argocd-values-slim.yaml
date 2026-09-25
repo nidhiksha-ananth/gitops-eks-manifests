@@ -1,0 +1,59 @@
+# Slimmed-down ArgoCD install for a memory-constrained local (minikube) environment.
+# Disables components not needed for this project (notifications, applicationset)
+# and gives the core components explicit, modest memory so they don't get starved.
+
+notifications:
+  enabled: false
+
+applicationSet:
+  enabled: false
+
+dex:
+  enabled: false # not using SSO; removes one more pod
+
+redis:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+repoServer:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+  # give health checks more breathing room under CPU/memory pressure
+  livenessProbe:
+    timeoutSeconds: 10
+    failureThreshold: 5
+  readinessProbe:
+    timeoutSeconds: 10
+    failureThreshold: 5
+
+server:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 150m
+      memory: 256Mi
+
+controller:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 300m
+      memory: 384Mi
+
+configs:
+  params:
+    server.insecure: true # skip TLS complexity for local dev; fine for this use case
